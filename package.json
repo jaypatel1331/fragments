@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "description": "lab 1 for CCP555",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --config .eslintrc.js src/**"
   },
   "repository": {
     "type": "git",
@@ -13,6 +14,8 @@
   "author": "Jay Patel",
   "license": "UNLICENSED",
   "devDependencies": {
+    "eslint": "^8.31.0",
+    "eslint-plugin-react": "^7.32.0",
     "prettier": "2.8.2"
   }
 }

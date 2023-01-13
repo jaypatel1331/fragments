@@ -11,5 +11,8 @@
     "url": "git+https://github.com/jaypatel1331/fragments.git"
   },
   "author": "Jay Patel",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "prettier": "2.8.2"
+  }
 }

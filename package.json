@@ -1,0 +1,15 @@
+{
+  "name": "fragments",
+  "private": true,
+  "version": "0.0.1",
+  "description": "lab 1 for CCP555",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaypatel1331/fragments.git"
+  },
+  "author": "Jay Patel",
+  "license": "UNLICENSED"
+}

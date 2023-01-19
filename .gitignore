@@ -92,6 +92,9 @@ dist
 # vuepress build output
 .vuepress/dist
 
+# ignore parcel cache
+.parcel-cache/
+
 # Serverless directories
 .serverless/
 

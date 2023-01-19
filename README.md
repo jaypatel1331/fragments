@@ -14,7 +14,7 @@ npm run lint
 node src/server.js
 ```
 
-or
+or we can also use the other way that is
 
 ```sh
 npm start

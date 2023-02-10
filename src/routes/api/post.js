@@ -4,8 +4,9 @@ require('dotenv').config();
 const url = process.env.API_URL;
 module.exports = async (req, res) => {
   try {
+    console.log('req.body', req.user);
     const fragment = new Fragment({
-      ownerId: req.user.id,
+      ownerId: req.user,
       type: req.get('content-type'),
     });
     await fragment.save();

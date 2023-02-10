@@ -1,17 +1,14 @@
-// .eslintrc.js
-
 module.exports = {
   env: {
-    node: true,
-    commonjs: true,
     es2021: true,
-    // Add this next line to configure ESLint for Jest, see:
-    // https://eslint.org/docs/user-guide/configuring/language-options#specifying-environments
+    commonjs: true,
+    node: true,
     jest: true,
   },
   extends: 'eslint:recommended',
+  overrides: [],
   parserOptions: {
-    ecmaVersion: 13,
+    ecmaVersion: 'latest',
   },
   rules: {},
 };

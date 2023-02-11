@@ -2,8 +2,15 @@ const { createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
 module.exports = async (req, res) => {
   try {
-    console.log('req.body', req.user);
-    const fragment = await Fragment.byId(req.user, req.params.id);
+    var fraId = req.params.id;
+
+    var ext = '';
+    if (fraId.indexOf('.txt') !== -1) {
+      ext = '.txt';
+      fraId = fraId.substring(0, fraId.indexOf(ext));
+    }
+
+    const fragment = await Fragment.byId(req.user, fraId);
     res.setHeader('Content-Type', fragment.type);
     const fragmentData = await fragment.getData();
     res.status(200).send(fragmentData);

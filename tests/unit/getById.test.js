@@ -59,4 +59,23 @@ describe('GET /v1/fragments/:id', () => {
     expect(res2.statusCode).toBe(200);
     expect(res2.text).toBe('this is the value');
   });
+
+  // Id with ".txt" extension will return the content too
+  test('Id with ".txt" extension will return the content', async () => {
+    const res = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('content-type', 'text/plain')
+      .send('this is the value');
+
+    const jsondata = JSON.parse(res.text);
+    const id = jsondata.fragment[0].id;
+
+    const res2 = await request(app)
+      .get(`/v1/fragments/${id}.txt`)
+      .auth('user1@email.com', 'password1');
+
+    expect(res2.statusCode).toBe(200);
+    expect(res2.text).toBe('this is the value');
+  });
 });

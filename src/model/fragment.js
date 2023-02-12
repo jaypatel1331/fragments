@@ -15,6 +15,7 @@ const {
 } = require('./data');
 
 class Fragment {
+  // constructor check for the required fields and throws an error if they are missing
   constructor({ id, ownerId, created = new Date(), updated = new Date(), type, size = 0 }) {
     if (!ownerId || !type) {
       throw new Error(`ownerId and type are required`);

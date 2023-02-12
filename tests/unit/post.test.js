@@ -1,22 +1,28 @@
 const request = require('supertest');
 const app = require('../../src/app');
-describe('POST /v1/fragments', () => {
-  // If the request is missing the Authorization header, it should be forbidden
-  test('unauthenticated requests are denied', () => request(app).post('/v1/fragments').expect(401));
+const crypto = require('crypto');
+require('dotenv').config();
+const url = process.env.API_URL;
 
-  // If the wrong username/password pair are used (no such user), it should be forbidden
-  test('incorrect credentials are denied', () =>
+describe('POST /v1/fragments', () => {
+  // If the user is not authenticated, it should receive a 401 error
+  test('unauthenticated user should receive 401 error', () =>
+    request(app).post('/v1/fragments').expect(401));
+
+  //  If the user credentials are incorrect, it should receive a 401 error
+  test('incorrect credentials should receive 401 error', () =>
     request(app).post('/v1/fragments').auth('invalid@email.com', 'incorrect_password').expect(401));
 
-  // test with valid credentials amd should give a success result with an empty fragments array
-  test('authenticated users get a fragments array', async () => {
+  // unauthenticated users should receive an empty array
+  test('authenticated users get an empty fragment', async () => {
     const res = await request(app).get('/v1/fragments').auth('user1@email.com', 'password1');
     expect(res.statusCode).toBe(200);
     expect(res.body.status).toBe('ok');
     expect(Array.isArray(res.body.fragments)).toBe(true);
   });
-  // If the type is not supported, it should fail
-  test('unsupported type leads to failure', async () => {
+
+  // unsupported content type should throw 415 error
+  test('unsupported content-type throw 415 error', async () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
@@ -24,13 +30,39 @@ describe('POST /v1/fragments', () => {
     expect(res.statusCode).toBe(415);
   });
 
-  test('fragment with data works', async () => {
+  // check the fragment data when post request is made
+  test('check the fragment data after post request is done', async () => {
+    const value = Buffer.from('Hello, world!').toString();
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
       .set('content-type', 'text/plain')
-      .send('Hello, world!');
+      .send(value);
+
+    const data = JSON.parse(res.text);
+    const userID = crypto.createHash('sha256').update('user1@email.com').digest('hex');
+
     expect(res.statusCode).toBe(201);
     expect(res.type).toBe('text/plain');
+    expect(data.fragment[0].ownerId).toBe(userID);
+    expect(data.fragment[0].size).toBe(value.length);
+    expect(res.type).toBe('text/plain');
+    expect(res.text).toContain('created');
+    expect(res.text).toContain('updated');
+  });
+  // test to check the location header
+  test('check the location header', async () => {
+    const value = Buffer.from('Hello, world!').toString();
+    const res = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('content-type', 'text/plain')
+      .send(value);
+
+    const data = JSON.parse(res.text);
+    const fragmentID = data.fragment[0].id;
+
+    expect(res.statusCode).toBe(201);
+    expect(res.header.location).toBe(url + '/v1/fragments/' + fragmentID);
   });
 });

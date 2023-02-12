@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
       })
     );
   } catch (err) {
+    logger.warn({ err }, 'unable to send the fragment data to the database');
     res.status(415).json(response.createErrorResponse(415, err));
   }
 };

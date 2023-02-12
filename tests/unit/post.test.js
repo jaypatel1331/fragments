@@ -26,7 +26,7 @@ describe('POST /v1/fragments', () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
-      .set('content-type', 'application/pdf');
+      .set('content-type', 'text/markdown');
     expect(res.statusCode).toBe(415);
   });
 

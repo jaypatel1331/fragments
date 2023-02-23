@@ -50,7 +50,7 @@ describe('GET /v1/fragments/:id', () => {
 
     // parse the response to get the id from the json response
     const jsondata = JSON.parse(res.text);
-    const id = jsondata.fragment[0].id;
+    const id = jsondata.fragment.id;
 
     const res2 = await request(app).get(`/v1/fragments/${id}`).auth('user1@email.com', 'password1');
 
@@ -68,7 +68,7 @@ describe('GET /v1/fragments/:id', () => {
 
     // parse the response to get the id from the json response
     const jsondata = JSON.parse(res.text);
-    const id = jsondata.fragment[0].id;
+    const id = jsondata.fragment.id;
 
     const res2 = await request(app)
       .get(`/v1/fragments/${id}.txt`)

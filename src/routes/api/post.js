@@ -1,8 +1,6 @@
 const response = require('../../response');
 const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
-require('dotenv').config();
-const url = process.env.API_URL;
 module.exports = async (req, res) => {
   try {
     // post the fragment data to the variable
@@ -17,11 +15,11 @@ module.exports = async (req, res) => {
     await fragment.save();
     await fragment.setData(req.body);
     res.setHeader('Content-type', fragment.type);
-    res.setHeader('Location', url + '/v1/fragments/' + fragment.id);
+    res.setHeader('Location', `${req.protocol}://${req.get('host')}/v1/fragments/${fragment.id}`);
     res.status(201).json(
       response.createSuccessResponse({
         status: 'ok',
-        fragment: [fragment],
+        fragment: fragment,
       })
     );
   } catch (err) {

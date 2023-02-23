@@ -41,7 +41,7 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    return await listFragments(ownerId, expand);
+    return listFragments(ownerId, expand);
   }
 
   /**

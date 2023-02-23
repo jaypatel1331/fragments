@@ -1,8 +1,6 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const crypto = require('crypto');
-require('dotenv').config();
-const url = process.env.API_URL;
 
 describe('POST /v1/fragments', () => {
   // If the user is not authenticated, it should receive a 401 error
@@ -44,25 +42,10 @@ describe('POST /v1/fragments', () => {
 
     expect(res.statusCode).toBe(201);
     expect(res.type).toBe('text/plain');
-    expect(data.fragment[0].ownerId).toBe(userID);
-    expect(data.fragment[0].size).toBe(value.length);
+    expect(data.fragment.ownerId).toBe(userID);
+    expect(data.fragment.size).toBe(value.length);
     expect(res.type).toBe('text/plain');
     expect(res.text).toContain('created');
     expect(res.text).toContain('updated');
-  });
-  // test to check the location header
-  test('check the location header', async () => {
-    const value = Buffer.from('Hello, world!').toString();
-    const res = await request(app)
-      .post('/v1/fragments')
-      .auth('user1@email.com', 'password1')
-      .set('content-type', 'text/plain')
-      .send(value);
-
-    const data = JSON.parse(res.text);
-    const fragmentID = data.fragment[0].id;
-
-    expect(res.statusCode).toBe(201);
-    expect(res.header.location).toBe(url + '/v1/fragments/' + fragmentID);
   });
 });

@@ -23,7 +23,13 @@ class Fragment {
     if (size < 0 || typeof size != 'number') {
       throw new Error(`size should be a number and cannot be negative`);
     }
-    if (type != 'text/plain' && type != 'text/plain; charset=utf-8') {
+    if (
+      type != 'text/plain' &&
+      type != 'text/plain; charset=utf-8' &&
+      type != 'text/html' &&
+      type != 'text/markdown' &&
+      type != 'application/json'
+    ) {
       throw new Error(`this type is not supported`);
     }
     this.id = id || randomUUID();
@@ -114,7 +120,7 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    if (/(text\/)/.test(this.type)) {
+    if (/(text\/)/.test(this.mimeType)) {
       return true;
     }
     return false;
@@ -125,7 +131,22 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    return ['text/plain'];
+    const plainType = ['text/plain'];
+    const markType = ['text/plain', 'text/markdown', 'text/html'];
+    const htmlType = ['text/html', 'text/plain'];
+    const jsonType = ['application/json', 'text/plain'];
+    switch (this.mimeType) {
+      case 'text/plain':
+        return plainType;
+      case 'text/markdown':
+        return markType;
+      case 'text/html':
+        return htmlType;
+      case 'application/json':
+        return jsonType;
+      default:
+        return [this.mimeType];
+    }
   }
 
   /**
@@ -134,7 +155,13 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    if (value === 'text/plain' || value === 'text/plain; charset=utf-8') {
+    if (
+      value === 'text/plain' ||
+      value === 'text/plain; charset=utf-8' ||
+      value === 'text/html' ||
+      value === 'text/markdown' ||
+      value === 'application/json'
+    ) {
       return true;
     } else {
       return false;

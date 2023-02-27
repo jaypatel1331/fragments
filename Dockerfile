@@ -5,7 +5,7 @@
 
 #step 20- stage 0: install the dependencies
 #step20-node version for the docker image with alpine linux(to improve security and reduce size)
-FROM node:19.4.0@sha256:c1d6d7364e956b061d62241c362b3cd0856beba066ec60e25523a169e2137623-alpine3.17.2@sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a as dependencies
+FROM node:19.4.0 as dependencies
 
 
 #step 20: optimiing the docker file and set the node environment to production
@@ -43,7 +43,7 @@ USER node
 
 ############################################################################################3
 #steop 20: stage 1: build the project
-FROM node:19.4.0@sha256:c1d6d7364e956b061d62241c362b3cd0856beba066ec60e25523a169e2137623-alpine3.17.2@sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a as builder
+FROM node:19.4.0 as builder
 
 # Use /app as our working directory
 WORKDIR /app

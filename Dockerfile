@@ -2,13 +2,19 @@
 # that will be used to build the project
 # and run the tests
 
-# Use node version 18.13.0
-FROM node:19.4.0
+
+#step 20- stage 0: install the dependencies
+#step20-node version for the docker image with alpine linux(to improve security and reduce size)
+FROM node:19.4.0@sha256:c1d6d7364e956b061d62241c362b3cd0856beba066ec60e25523a169e2137623-alpine3.17.2@sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a as dependencies
+
+
+#step 20: optimiing the docker file and set the node environment to production
+ENV NODE_ENV=production
+
 
 #maintainer information and description
 LABEL maintainer="Jay Patel (japatel31@myseneca.ca)"
 LABEL description="Fragments node.js microservice"
-
 
 # We default to use port 8080 in our service
 ENV PORT=8080
@@ -28,19 +34,37 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install node dependencies defined in package-lock.json
-RUN npm install
+#RUN npm install
+#step 20: optimiing the docker file and install node dependencies
+RUN npm ci --only=production
+
+
+USER node
+
+############################################################################################3
+#steop 20: stage 1: build the project
+FROM node:19.4.0@sha256:c1d6d7364e956b061d62241c362b3cd0856beba066ec60e25523a169e2137623-alpine3.17.2@sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a as builder
+
+# Use /app as our working directory
+WORKDIR /app
+
+#step 20: optimizing the docker file and get the dependencies from the previous stage
+COPY --from=dependencies /app /app
 
 # Copy src/
-COPY ./src ./src
+#step 20: optimizing the docker file and copy the src
+COPY --chown=node:node ./src ./src
 
 # Copy our HTPASSWD file
 COPY ./tests/.htpasswd ./tests/.htpasswd
 
+#copy source of the project
+COPY . .
+
 # Start the container by running our server
-CMD npm start
+#CMD npm start
+#step 20: optimiing the docker file and start the container running the server
+CMD ["npm", "start"]
 
 # We run our service on port 8080
 EXPOSE 8080
-
-
-

@@ -13,8 +13,8 @@ describe('GET /v1/fragments', () => {
   test('incorrect credentials receive 401 error', () =>
     request(app).get('/v1/fragments').auth('jaypatel@email.com', 'jaypatel').expect(401));
 
-  // authenticated users should receive empty array
-  test('authenticated users should receive empty array', async () => {
+  // authenticated users should receive array
+  test('authenticated users should receive an array', async () => {
     const res = await request(app).get('/v1/fragments').auth('user1@email.com', 'password1');
     expect(res.statusCode).toBe(200);
     expect(res.body.status).toBe('ok');

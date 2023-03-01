@@ -37,4 +37,7 @@ router.post('/fragments', rawBody(), require('./post'));
 // define the route for /v1/fragments/:id
 router.get('/fragments/:id', require('./getById'));
 
+// define the route for /v1/fragments/:id/info
+router.get('/fragments/:id/info', require('./getByIdInfo'));
+
 module.exports = router;

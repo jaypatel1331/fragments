@@ -1,16 +1,13 @@
-/**
- * Get a list of fragments for the current user
- */
 const logger = require('../../logger');
+const { Fragment } = require('../../model/fragment');
 const { createSuccessResponse } = require('../../response');
 
-module.exports = (req, res) => {
-  // TODO: this is just a placeholder to get something working...
+module.exports = async (req, res) => {
   if (res) {
     logger.debug('getting fragments');
     res.status(200).json(
       createSuccessResponse({
-        fragments: [],
+        fragments: await Fragment.byUser(req.user, req.query.expand),
       })
     );
   }

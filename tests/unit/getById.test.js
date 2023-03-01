@@ -77,4 +77,20 @@ describe('GET /v1/fragments/:id', () => {
     expect(res2.statusCode).toBe(200);
     expect(res2.text).toBe('this is the value');
   });
+
+  // if url contain typs is text/markdown, it will convert it to html
+  test('authenticated users get a fragments array', async () => {
+    const data = Buffer.from('This is fragment');
+    const postRes = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/markdown')
+      .send(data);
+    var fragmentData = JSON.parse(postRes.text);
+    const id = fragmentData.fragment.id;
+    const getRes = await request(app)
+      .get(`/v1/fragments/${id}.html`)
+      .auth('user1@email.com', 'password1');
+    expect(getRes.statusCode).toBe(200);
+  });
 });

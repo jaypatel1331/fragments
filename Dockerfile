@@ -44,7 +44,7 @@ USER node
 
 ############################################################################################3
 #steop 20: stage 1: build the project
-FROM node:19.4.0-alpine@sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a as builder
+FROM node:19.4.0-alpine as builder
 
 # Use /app as our working directory
 WORKDIR /app

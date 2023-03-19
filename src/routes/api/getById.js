@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
     const fragmentData = await fragment.getData();
 
     // if the fragment is html then convert it to markdown
-    if (req.params.id.includes('.html') && fragment.type == 'text/markdown') {
+    if (req.params.id.includes('.html') && fragment.type === 'text/markdown') {
       res.setHeader('Content-Type', 'text/html');
       logger.debug('sending html data to after converting from markdown');
       res.status(200).send(md.render(fragmentData.toString()));

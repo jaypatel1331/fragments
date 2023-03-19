@@ -35,7 +35,7 @@ describe('POST /v1/fragments', () => {
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
       .set('content-type', 'text/plain')
-      .send(value);
+      .send('Hello, world!');
 
     const data = JSON.parse(res.text);
     const userID = crypto.createHash('sha256').update('user1@email.com').digest('hex');

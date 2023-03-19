@@ -36,7 +36,7 @@ COPY package.json package-lock.json ./
 # Install node dependencies defined in package-lock.json
 #RUN npm install
 #step 20: optimiing the docker file and install node dependencies
-RUN npm ci --only=production
+RUN npm install
 
 
 USER node

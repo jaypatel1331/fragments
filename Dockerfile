@@ -5,7 +5,7 @@
 
 #step 20- stage 0: install the dependencies
 #step20-node version for the docker image with alpine linux(to improve security and reduce size)
-FROM node:8-alpine as dependencies
+FROM node:18-alpine as dependencies
 
 
 #step 20: optimiing the docker file and set the node environment to production

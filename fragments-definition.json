@@ -31,6 +31,10 @@
           "value": "28ekn2d7ruordbpd79c0m1l4kh"
         },
         {
+          "name": "AWS_S3_BUCKET_NAME",
+          "value": "japatel31-fragments"
+        },
+        {
           "name": "AWS_COGNITO_POOL_ID",
           "value": "us-east-1_Uj3a9p91S"
         },
@@ -76,7 +80,7 @@
   ],
   "placementConstraints": [],
   "memory": "512",
-  "taskRoleArn": null,
+  "taskRoleArn": "arn:aws:iam::954799157787:role/LabRole",
   "compatibilities": ["EC2", "FARGATE"],
   "taskDefinitionArn": "arn:aws:ecs:us-east-1:954799157787:task-definition/fragments-task:1",
   "family": "fragments-task",

@@ -40,4 +40,7 @@ router.get('/fragments/:id', require('./getById'));
 // define the route for /v1/fragments/:id/info
 router.get('/fragments/:id/info', require('./getByIdInfo'));
 
+//define the route for deltetion of fragments
+router.delete('/fragments/:id', require('./delete'));
+
 module.exports = router;

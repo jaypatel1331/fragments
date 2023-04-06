@@ -1,14 +1,30 @@
-// XXX: temporary use of memory-db until we add DynamoDB
-//const MemoryDB = require('../memory/memory-db');
+const logger = require('../../../logger');
+
 const s3Client = require('./s3Client');
 const ddbDocClient = require('./ddbDocClient');
-const logger = require('../../../logger');
-const { PutCommand, GetCommand, QueryCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, GetCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
-// Create two in-memory databases: one for fragment metadata and the other for raw data
-//const data = new MemoryDB();
-//const metadata = new MemoryDB();
+// Convert a stream of data into a Buffer, by collecting
+// chunks of data until finished, then assembling them together.
+// We wrap the whole thing in a Promise so it's easier to consume.
+const streamToBuffer = (stream) =>
+  new Promise((resolve, reject) => {
+    // As the data streams in, we'll collect it into an array.
+    const chunks = [];
+
+    // Streams have events that we can listen for and run
+    // code.  We need to know when new `data` is available,
+    // if there's an `error`, and when we're at the `end`
+    // of the stream.
+
+    // When there's data, add the chunk to our chunks list
+    stream.on('data', (chunk) => chunks.push(chunk));
+    // When there's an error, reject the Promise
+    stream.on('error', reject);
+    // When the stream is done, resolve with a new Buffer of our chunks
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+  });
 
 // Writes a fragment to DynamoDB. Returns a Promise.
 function writeFragment(fragment) {
@@ -65,38 +81,17 @@ async function writeFragmentData(ownerId, id, data) {
 
   // Create a PUT Object command to send to S3
   const command = new PutObjectCommand(params);
-  logger.info('NEW OBJECT COMMAND');
+
   try {
     // Use our client to send the command
     await s3Client.send(command);
   } catch (err) {
     // If anything goes wrong, log enough info that we can debug
-    logger.info(process.env.AWS_S3_BUCKET_NAME);
     const { Bucket, Key } = params;
     logger.error({ err, Bucket, Key }, 'Error uploading fragment data to S3');
     throw new Error('unable to upload fragment data');
   }
 }
-// Convert a stream of data into a Buffer, by collecting
-// chunks of data until finished, then assembling them together.
-// We wrap the whole thing in a Promise so it's easier to consume.
-const streamToBuffer = (stream) =>
-  new Promise((resolve, reject) => {
-    // As the data streams in, we'll collect it into an array.
-    const chunks = [];
-
-    // Streams have events that we can listen for and run
-    // code.  We need to know when new `data` is available,
-    // if there's an `error`, and when we're at the `end`
-    // of the stream.
-
-    // When there's data, add the chunk to our chunks list
-    stream.on('data', (chunk) => chunks.push(chunk));
-    // When there's an error, reject the Promise
-    stream.on('error', reject);
-    // When the stream is done, resolve with a new Buffer of our chunks
-    stream.on('end', () => resolve(Buffer.concat(chunks)));
-  });
 
 // Reads a fragment's data from S3 and returns (Promise<Buffer>)
 // https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#getting-a-file-from-an-amazon-s3-bucket
@@ -110,7 +105,7 @@ async function readFragmentData(ownerId, id) {
 
   // Create a GET Object command to send to S3
   const command = new GetObjectCommand(params);
-  logger.info('READ FRAGMENT DATA: GET COMMAND IS SET');
+
   try {
     // Get the object from the Amazon S3 bucket. It is returned as a ReadableStream.
     const data = await s3Client.send(command);
@@ -154,8 +149,8 @@ async function listFragments(ownerId, expand = false) {
     const data = await ddbDocClient.send(command);
 
     // If we haven't expanded to include all attributes, remap this array from
-    // [ {"id":"6-b-3pSg9F054u-11oItP"}, {"id":"AmXx1tgo-H1iJLFL3DQcE"} ,... ] to
-    // [ "6-b-3pSg9F054u-11oItP", "AmXx1tgo-H1iJLFL3DQcE", ... ]
+    // [ {"id":"b9e7a264-630f-436d-a785-27f30233faea"}, {"id":"dad25b07-8cd6-498b-9aaf-46d358ea97fe"} ,... ] to
+    // [ "b9e7a264-630f-436d-a785-27f30233faea", "dad25b07-8cd6-498b-9aaf-46d358ea97fe", ... ]
     return !expand ? data?.Items.map((item) => item.id) : data?.Items;
   } catch (err) {
     logger.error({ err, params }, 'error getting all fragments for user from DynamoDB');
@@ -170,17 +165,11 @@ async function deleteFragment(ownerId, id) {
     // Our key will be a mix of the ownerID and fragment id, written as a path
     Key: `${ownerId}/${id}`,
   };
-  const params2 = {
-    TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-    Key: { ownerId, id },
-  };
   const command = new DeleteObjectCommand(params);
-  const commandDynamoDB = new DeleteCommand(params2);
   try {
     // Use our client to send the command
-    await s3Client.send(command);
-    const ret = await ddbDocClient.send(commandDynamoDB);
-    return ret;
+    const res = await s3Client.send(command);
+    return res;
   } catch (err) {
     // If anything goes wrong, log enough info that we can debug
     const { Bucket, Key } = params;

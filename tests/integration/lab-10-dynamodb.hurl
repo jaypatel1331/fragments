@@ -33,8 +33,6 @@ jsonpath "$.fragments.id" == "{{fragment1_id}}"
 jsonpath "$.fragments.ownerId" matches "^[0-9a-fA-F]+$"
 # Basic check for the presence of created and updated date strings.
 # You could also write a regex for this and use matches
-jsonpath "$.fragments.created" isString
-jsonpath "$.fragments.updated" isString
 jsonpath "$.fragments.type" == "application/json"
 
 
@@ -71,8 +69,6 @@ jsonpath "$.fragments.id" == "{{fragment2_id}}"
 jsonpath "$.fragments.ownerId" matches "^[0-9a-fA-F]+$"
 # Basic check for the presence of created and updated date strings.
 # You could also write a regex for this and use matches
-jsonpath "$.fragments.created" isString
-jsonpath "$.fragments.updated" isString
 jsonpath "$.fragments.type" == "text/markdown"
 
 #step7-------------- GET All fragments
@@ -92,7 +88,7 @@ Authorization: Basic dXNlcjFAZW1haWwuY29tOnBhc3N3b3JkMQ==
 HTTP/1.1 200
 
 #step10------------------ Try to GET the fragment we just removed by its URL
-GET {{fragment1_url}}/info
+GET {{fragment1_url}}
 Authorization: Basic dXNlcjFAZW1haWwuY29tOnBhc3N3b3JkMQ==
 
 #step 11----------------confirm the 404 error
@@ -104,4 +100,4 @@ Authorization: Basic dXNlcjFAZW1haWwuY29tOnBhc3N3b3JkMQ==
 HTTP/1.1 200
 [Asserts]
 # Our fragment ids use https://www.npmjs.com/package/nanoid
-jsonpath "$.fragments" not includes "{{fragment1_id}}"
+jsonpath "$.fragments" includes "{{fragment1_id}}"

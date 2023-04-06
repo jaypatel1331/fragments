@@ -13,9 +13,9 @@ services:
       # Our API will be running on http://localhost:8080
       - API_URL=http://localhost:8080
       # add aws secret key
-      - AWS_ACCESS_KEY_ID=ASIA54TTW6INVXWWPR5X
-      - AWS_SECRET_ACCESS_KEY=5FJazSSYlg2P4SJbX45fOxfHTp0efIzzgB9blnBS
-      - AWS_SESSION_TOKEN=FwoGZXIvYXdzEEwaDCQW/Lf4tt/DoD2poSLGAZxbIXEeiwzdqoXEXaL65cfaTB49BBrtF01Yq3+dPJyhZmX1fHtoRntgZOaHvgV2R7PB8JTnaFSJAEIukcOvewHtqP+lisbX8XUZuUONO6WLPU3SXhPeRu0bdZ9//DAW9+ZdV65R5ExbYWQ1iJwSwt0oYFf+IgVoHSvtxhICqbsAPGScclgyS7S8YkocSHnT79ugbbiKZhTZykpuubvpeC9QyHQNZoL54dwE7batwoFmFE+2hvvRi6RY0SYNTjCwwWy7d6HiwCi/27ihBjIt7WEADFGKw28UR+9CnLF3hEBjSVbwLs83M7jc8OmDT3OcJTLXtIoOE+NsNTlX
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_SESSION_TOKEN=test
       # Use Basic Auth (for running tests, CI)
       - HTPASSWD_FILE=tests/.htpasswd
       # Use the LOG_LEVEL set in the host environment, or default to info

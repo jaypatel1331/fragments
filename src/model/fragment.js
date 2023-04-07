@@ -3,6 +3,8 @@
 const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
+const md = require('markdown-it')();
+const sharp = require('sharp');
 
 // Functions for working with fragment metadata/data using our DB
 const {
@@ -28,13 +30,17 @@ class Fragment {
       type != 'text/plain; charset=utf-8' &&
       type != 'text/html' &&
       type != 'text/markdown' &&
-      type != 'application/json'
+      type != 'application/json' &&
+      type != 'image/png' &&
+      type != 'image/jpeg' &&
+      type != 'image/webp' &&
+      type != 'image/gif'
     ) {
       throw new Error(`this type is not supported`);
     }
     this.id = id || randomUUID();
     this.ownerId = ownerId;
-    this.created = created || new Date().toISOString();
+    this.created = created || created.toISOString();
     this.updated = updated || updated.toISOString();
     this.type = type;
     this.size = size;
@@ -91,18 +97,18 @@ class Fragment {
     return readFragmentData(this.ownerId, this.id);
   }
 
-  /**
-   * Set's the fragment's data in the database
-   * @param {Buffer} data
-   * @returns Promise<void>
-   */
   async setData(data) {
-    if (!Buffer.isBuffer(data)) {
-      throw new Error(`data is not a buffer`);
+    try {
+      if (!data) {
+        return Promise.reject(new Error('Data cannot be empty.'));
+      }
+      this.updated = new Date().toISOString();
+      this.size = data.length;
+      await writeFragment(this);
+      return writeFragmentData(this.ownerId, this.id, data);
+    } catch (err) {
+      Promise.reject(err);
     }
-    this.size = Buffer.byteLength(data);
-    await this.save();
-    return await writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -135,6 +141,7 @@ class Fragment {
     const markType = ['text/plain', 'text/markdown', 'text/html'];
     const htmlType = ['text/html', 'text/plain'];
     const jsonType = ['application/json', 'text/plain'];
+    const imageType = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
     switch (this.mimeType) {
       case 'text/plain':
         return plainType;
@@ -144,6 +151,14 @@ class Fragment {
         return htmlType;
       case 'application/json':
         return jsonType;
+      case 'image/png':
+        return imageType;
+      case 'image/jpeg':
+        return imageType;
+      case 'image/gif':
+        return imageType;
+      case 'image/webp':
+        return imageType;
       default:
         return [this.mimeType];
     }
@@ -160,11 +175,37 @@ class Fragment {
       value === 'text/plain; charset=utf-8' ||
       value === 'text/html' ||
       value === 'text/markdown' ||
-      value === 'application/json'
+      value === 'application/json' ||
+      value === 'image/png' ||
+      value === 'image/jpeg' ||
+      value === 'image/webp' ||
+      value === 'image/gif'
     ) {
       return true;
     } else {
       return false;
+    }
+  }
+
+  convertData(data, type) {
+    switch (type) {
+      case 'text/html':
+        if (this.type === 'text/markdown') {
+          return md.render(data.toString());
+        }
+        return data;
+      case 'image/png':
+        return sharp(data).toFormat('png');
+      case 'image/jpeg':
+        return sharp(data).toFormat('jpeg');
+      case 'image/gif':
+        return sharp(data).toFormat('gif');
+      case 'image/webp':
+        return sharp(data).toFormat('webp');
+      case 'text/plain':
+        return data.toString();
+      default:
+        return data;
     }
   }
 }

@@ -1,32 +1,39 @@
+// src/routes/api/getById.js
 const { createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
+const mime = require('mime-types');
 const logger = require('../../logger');
-var md = require('markdown-it')();
+const path = require('path');
 
 module.exports = async (req, res) => {
+  var id = req.params.id;
+  var extension = mime.lookup(id);
+
+  if (req.params.id.includes('.')) {
+    id = path.parse(req.params.id).name;
+  }
   try {
-    // check for the required id with .txt extension and extract the id from the url
-    var fraId = req.params.id;
-    // if id contains extension then extract the Id
-    if (fraId.includes('.')) {
-      fraId = fraId.split('.').slice(0, -1).join('.');
-    }
-
-    // save the fragment data to the variable
-    const fragment = await Fragment.byId(req.user, fraId);
-    const fragmentData = await fragment.getData();
-
-    // if the fragment is html then convert it to markdown
-    if (req.params.id.includes('.html') && fragment.type === 'text/markdown') {
-      res.setHeader('Content-Type', 'text/html');
-      logger.debug('sending html data to after converting from markdown');
-      res.status(200).send(md.render(fragmentData.toString()));
-    } else {
-      res.setHeader('Content-Type', fragment.type);
-      res.status(200).send(fragmentData);
+    logger.info('get the fragment id');
+    const fragment = await Fragment.byId(req.user, id);
+    logger.info('getting fragment data');
+    var fragmentData = await fragment.getData();
+    var type;
+    try {
+      if (fragment.formats.includes(extension)) {
+        logger.info(extension);
+        type = extension;
+      } else if (extension == false) {
+        logger.info('there is no extension');
+        type = fragment.mimeType;
+      }
+      var data = fragment.convertData(fragmentData, type);
+      res.setHeader('Content-type', type);
+      logger.info('sending data');
+      res.status(200).send(data);
+    } catch (error) {
+      res.status(415).json(createErrorResponse(415, 'unable to convert data'));
     }
   } catch (error) {
-    logger.warn({ error }, 'error sending fragment data to user');
     res.status(404).json(createErrorResponse(404, error));
   }
 };

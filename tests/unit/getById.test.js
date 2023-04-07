@@ -25,6 +25,26 @@ describe('GET /v1/fragments/:id', () => {
     expect(res2.body.status).toBe('error');
   });
 
+  // test unable to convert data
+  test('unable to convert data', async () => {
+    const res = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('content-type', 'text/plain')
+      .send('this is the value');
+
+    // parse the response to get the id from the json response
+    const jsondata = JSON.parse(res.text);
+    const id = jsondata.fragment.id;
+
+    const res2 = await request(app)
+      .get(`/v1/fragments/${id}.ext`)
+      .auth('user1@email.com', 'password1');
+
+    expect(res2.statusCode).toBe(415);
+    expect(res2.body.status).toBe('error');
+  });
+
   // if user tries to access the id which is not owned by him, it will return 404
   test('id not owned by the user can not access the id of other fragment', async () => {
     const res = await request(app)

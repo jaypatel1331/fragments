@@ -2,7 +2,7 @@ const logger = require('../../../logger');
 
 const s3Client = require('./s3Client');
 const ddbDocClient = require('./ddbDocClient');
-const { PutCommand, GetCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, GetCommand, QueryCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 // Convert a stream of data into a Buffer, by collecting
@@ -165,16 +165,24 @@ async function deleteFragment(ownerId, id) {
     // Our key will be a mix of the ownerID and fragment id, written as a path
     Key: `${ownerId}/${id}`,
   };
+
+  const fragmentParams = {
+    TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+    Key: { ownerId, id },
+  };
+
+  // Create a DELETE Object command to send to S3
   const command = new DeleteObjectCommand(params);
+  const fragmentCommand = new DeleteCommand(fragmentParams);
+
   try {
     // Use our client to send the command
-    const res = await s3Client.send(command);
-    return res;
+    await s3Client.send(command);
+    await ddbDocClient.send(fragmentCommand);
   } catch (err) {
-    // If anything goes wrong, log enough info that we can debug
     const { Bucket, Key } = params;
-    logger.error({ err, Bucket, Key }, 'Error deleting fragment from S3');
-    throw new Error('unable to delete fragment');
+    logger.error({ err, Bucket, Key }, 'Error deleting fragment data from S3');
+    throw new Error('unable to delete fragment data');
   }
 }
 

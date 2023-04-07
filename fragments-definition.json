@@ -31,6 +31,10 @@
           "value": "28ekn2d7ruordbpd79c0m1l4kh"
         },
         {
+          "name": "AWS_DYNAMODB_TABLE_NAME",
+          "value": "fragments"
+        },
+        {
           "name": "AWS_S3_BUCKET_NAME",
           "value": "japatel31-fragments"
         },

@@ -12,8 +12,11 @@ module.exports = async (req, res) => {
     });
 
     // save the fragment data to the database
+    logger.info('saving the fragment data to the database');
     await fragment.save();
+    logger.info('setting the fragment data');
     await fragment.setData(req.body);
+    logger.info('posting the fragment data to the database');
     res.setHeader('Content-type', fragment.type);
     res.setHeader('Location', `${req.protocol}://${req.get('host')}/v1/fragments/${fragment.id}`);
     res.status(201).json(
@@ -23,7 +26,6 @@ module.exports = async (req, res) => {
       })
     );
   } catch (err) {
-    logger.warn({ err }, 'unable to send the fragment data to the database');
     res.status(415).json(response.createErrorResponse(415, err));
   }
 };

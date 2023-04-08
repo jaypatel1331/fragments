@@ -173,6 +173,7 @@ async function deleteFragment(ownerId, id) {
 
   // Create a DELETE Object command to send to S3
   const command = new DeleteObjectCommand(params);
+  // Create a DELETE command to send to DynamoDB
   const fragmentCommand = new DeleteCommand(fragmentParams);
 
   try {
@@ -181,7 +182,7 @@ async function deleteFragment(ownerId, id) {
     await ddbDocClient.send(fragmentCommand);
   } catch (err) {
     const { Bucket, Key } = params;
-    logger.error({ err, Bucket, Key }, 'Error deleting fragment data from S3');
+    logger.error({ err, Bucket, Key }, 'Error deleting fragment data');
     throw new Error('unable to delete fragment data');
   }
 }

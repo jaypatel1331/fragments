@@ -13,9 +13,9 @@ module.exports = async (req, res) => {
     id = path.parse(req.params.id).name;
   }
   try {
-    logger.info('get the fragment id');
+    logger.info('getting the fragment using id');
     const fragment = await Fragment.byId(req.user, id);
-    logger.info('getting fragment data');
+    logger.info('getting fragment data from database');
     var fragmentData = await fragment.getData();
     var type;
     try {
@@ -23,11 +23,14 @@ module.exports = async (req, res) => {
         logger.info(extension);
         type = extension;
       } else if (extension == false) {
-        logger.info('there is no extension');
+        logger.info('fragment without extension');
         type = fragment.mimeType;
       }
+
+      logger.info('converting data');
       var data = fragment.convertData(fragmentData, type);
       res.setHeader('Content-type', type);
+
       logger.info('sending data');
       res.status(200).send(data);
     } catch (error) {

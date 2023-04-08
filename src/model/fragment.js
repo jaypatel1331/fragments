@@ -18,7 +18,14 @@ const {
 
 class Fragment {
   // constructor check for the required fields and throws an error if they are missing
-  constructor({ id, ownerId, created = new Date(), updated = new Date(), type, size = 0 }) {
+  constructor({
+    id,
+    ownerId,
+    created = new Date().toISOString(),
+    updated = new Date(),
+    type,
+    size = 0,
+  }) {
     if (!ownerId || !type) {
       throw new Error(`ownerId and type are required`);
     }
@@ -100,7 +107,7 @@ class Fragment {
   async setData(data) {
     try {
       if (!data) {
-        return Promise.reject(new Error('Data cannot be empty.'));
+        return Promise.reject(new Error('no data provided'));
       }
       this.updated = new Date().toISOString();
       this.size = data.length;

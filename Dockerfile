@@ -5,7 +5,7 @@
 
 #step 20- stage 0: install the dependencies
 #step20-node version for the docker image with alpine linux(to improve security and reduce size)
-FROM node:18-alpine as dependencies
+FROM node:18.13.0-alpine@sha256:fda98168118e5a8f4269efca4101ee51dd5c75c0fe56d8eb6fad80455c2f5827 as dependencies
 
 
 #step 20: optimiing the docker file and set the node environment to production
@@ -36,7 +36,7 @@ COPY package.json package-lock.json ./
 # Install node dependencies defined in package-lock.json
 #RUN npm install
 #step 20: optimiing the docker file and install node dependencies
-RUN npm install
+RUN npm ci --only=production
 
 
 USER node
@@ -44,7 +44,7 @@ USER node
 
 ############################################################################################3
 #steop 20: stage 1: build the project
-FROM node:18-alpine as builder
+FROM node:18.13.0-alpine@sha256:fda98168118e5a8f4269efca4101ee51dd5c75c0fe56d8eb6fad80455c2f5827 as builder
 
 # Use /app as our working directory
 WORKDIR /app
@@ -62,10 +62,15 @@ COPY ./tests/.htpasswd ./tests/.htpasswd
 #copy source of the project
 COPY . .
 
+RUN apk --no-cache add dumb-init~=1.2.5
+
 # Start the container by running our server
 #CMD npm start
 #step 20: optimiing the docker file and start the container running the server
-CMD ["npm", "start"]
+CMD ["dumb-init", "node", "/app/src/server.js"]
 
 # We run our service on port 8080
 EXPOSE 8080
+
+HEALTHCHECK  --interval=30s --timeout=10s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1

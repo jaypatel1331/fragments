@@ -4,7 +4,7 @@ const { createSuccessResponse, createErrorResponse } = require('../../response')
 
 module.exports = async (req, res) => {
   try {
-    logger.debug('getting fragments');
+    logger.info('getting fragments');
     res.status(200).json(
       createSuccessResponse({
         fragments: await Fragment.byUser(req.user, req.query.expand),

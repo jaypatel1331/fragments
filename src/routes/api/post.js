@@ -3,7 +3,7 @@ const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
 module.exports = async (req, res) => {
   try {
-    // post the fragment data to the variable
+    // create new fragment
     logger.debug('body of the user fragment', req.user);
 
     const fragment = new Fragment({
@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
       type: req.get('content-type'),
     });
 
-    // save the fragment data to the database
+    // save the new fragment data to the database
     logger.info('saving the fragment data to the database');
     await fragment.save();
     logger.info('setting the fragment data');

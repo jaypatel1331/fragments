@@ -20,14 +20,14 @@ module.exports = async (req, res) => {
     var type;
     try {
       if (fragment.formats.includes(extension)) {
-        logger.info(extension);
+        logger.info('fragment with extension ' + extension);
         type = extension;
       } else if (extension == false) {
         logger.info('fragment without extension');
         type = fragment.mimeType;
       }
 
-      logger.info('converting data');
+      logger.info('converting data to the given type');
       var data = fragment.convertData(fragmentData, type);
       res.setHeader('Content-type', type);
 

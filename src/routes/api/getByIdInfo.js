@@ -5,7 +5,7 @@ const logger = require('../../logger');
 module.exports = async (req, res) => {
   try {
     const fragment = await Fragment.byId(req.user, req.params.id);
-    logger.info('got the fragment using id');
+    logger.info('Fragment found with id: ' + req.params.id);
     res.status(200).json(
       createSuccessResponse({
         status: 'ok',

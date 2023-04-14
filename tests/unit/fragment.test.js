@@ -6,8 +6,8 @@ const wait = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms)
 
 const validTypes = [
   `text/plain`,
-  /*
-   Currently, only text/plain is supported. Others will be added later.
+
+  // Currently, only text/plain is supported. Others will be added later.
 
   `text/markdown`,
   `text/html`,
@@ -16,7 +16,6 @@ const validTypes = [
   `image/jpeg`,
   `image/webp`,
   `image/gif`,
-  */
 ];
 
 describe('Fragment class', () => {
@@ -252,6 +251,18 @@ describe('Fragment class', () => {
 
       await Fragment.delete('1234', fragment.id);
       expect(() => Fragment.byId('1234', fragment.id)).rejects.toThrow();
+    });
+
+    // test to convert application/json to text/plain
+    test('a fragment can be converted from application/json to text/plain', async () => {
+      const data = Buffer.from('{"hello": "world"}');
+      const fragment = new Fragment({ ownerId: '1234', type: 'application/json', size: 0 });
+      await fragment.save();
+      await fragment.setData(data);
+
+      const fragment2 = await Fragment.byId('1234', fragment.id);
+      var fragmentData = fragment2.convertData(await fragment2.getData(), 'text/plain');
+      expect(fragmentData).toEqual('{"hello": "world"}');
     });
   });
 });

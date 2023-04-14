@@ -16,6 +16,7 @@ const {
   deleteFragment,
 } = require('./data');
 
+// Fragment class
 class Fragment {
   // constructor check for the required fields and throws an error if they are missing
   constructor({
@@ -107,7 +108,7 @@ class Fragment {
   async setData(data) {
     try {
       if (!data) {
-        return Promise.reject(new Error('no data provided'));
+        return Promise.reject(new Error('cannot add data to fragment, no data received'));
       }
       this.updated = new Date().toISOString();
       this.size = data.length;
@@ -193,6 +194,13 @@ class Fragment {
       return false;
     }
   }
+
+  /**
+   * Converts the fragment's data to the given type
+   * @param {string} type the type to convert to
+   * @returns {Promise<Buffer>} the converted data
+   * @throws {Error} if the type is not supported
+   **/
 
   convertData(data, type) {
     switch (type) {

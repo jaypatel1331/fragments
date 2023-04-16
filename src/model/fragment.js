@@ -212,7 +212,7 @@ class Fragment {
       case 'image/png':
         return sharp(data).toFormat('png');
       case 'image/jpeg':
-        return sharp(data).toFormat('jpg').toBuffer();
+        return sharp(data).toFormat('jpeg');
       case 'image/gif':
         return sharp(data).toFormat('gif');
       case 'image/webp':

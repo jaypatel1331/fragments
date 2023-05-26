@@ -1,7 +1,5 @@
 # fragments
 
-lab 1 for CCP555
-
 ## start server using lint
 
 ```sh
